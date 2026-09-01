@@ -1,6 +1,6 @@
 # MiniMax H3 Ref2VA RunPod worker
 
-An isolated RunPod Serverless worker for native MiniMax H3 reference-to-video-with-audio generation through ComfyUI 0.34.
+An isolated RunPod Serverless worker for native MiniMax H3 reference-to-video-with-audio generation. The image pins ComfyUI commit `3216c62e9962c3babd28a4dfea6e5aef50b8fe16`, because the current RunPod base release still ships ComfyUI 0.34 without the native H3 nodes.
 
 The worker accepts a ComfyUI API graph plus small base64 reference files. It writes the generated MP4 to a caller-provided presigned upload URL, avoiding RunPod's response-size limit. Model files are downloaded once onto the attached `/runpod-volume` network volume and reused across scale-to-zero cold starts.
 
