@@ -1,4 +1,4 @@
-FROM ghcr.io/bhumanai/minimax-h3-runpod-worker@sha256:e08c093dafbe5920b88d3bbe3c65a2459a0de633f3faec8fb44dc56aef98d98c
+FROM runpod/worker-comfyui:5.8.6-base
 
 ARG COMFYUI_COMMIT=3216c62e9962c3babd28a4dfea6e5aef50b8fe16
 
