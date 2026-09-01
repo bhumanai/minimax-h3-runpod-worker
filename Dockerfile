@@ -9,7 +9,7 @@ RUN git config --global --add safe.directory /comfyui \
     && uv pip install "transformers>=4.50.3,<5" "huggingface-hub<1.0" \
     && cd /comfyui \
     && timeout 300 python main.py --quick-test-for-ci --cpu \
-    && python -c "import asyncio, nodes; asyncio.run(nodes.init_extra_nodes(init_custom_nodes=False)); assert 'MiniMaxH3ReferenceToVideo' in nodes.NODE_CLASS_MAPPINGS"
+    && python -c "import asyncio, nodes; asyncio.run(nodes.init_extra_nodes(init_custom_nodes=False)); assert 'MiniMaxH3ReferenceToVideo' in nodes.NODE_CLASS_MAPPINGS" --cpu
 
 COPY extra_model_paths.yaml /comfyui/extra_model_paths.yaml
 COPY handler.py /handler.py
