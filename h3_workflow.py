@@ -21,6 +21,7 @@ def build_h3_ref2va_workflow(
     image_name: str,
     video_name: str,
     *,
+    audio_name: str | None = None,
     prompt: str,
     seed: int = 20260901,
     width: int = 768,
@@ -36,6 +37,8 @@ def build_h3_ref2va_workflow(
     if turbo and steps != 4:
         raise ValueError("The bundled H3 Turbo LoRA is a 4-step adapter")
     _validate_reference_prompt(prompt)
+    if audio_name is not None and (not isinstance(audio_name, str) or not audio_name.strip()):
+        raise ValueError("audio_name must be a non-empty filename when provided")
 
     model_node = "8" if turbo else "6"
     workflow: dict[str, dict[str, Any]] = {
@@ -78,7 +81,6 @@ def build_h3_ref2va_workflow(
                 "ref_image_size": "match",
                 "ref_images.ref_image_0": ["1", 0],
                 "ref_videos.ref_video_0": ["3", 0],
-                "ref_video_audios.ref_video_audio_0": ["3", 1],
             },
         },
         "10": {
@@ -133,6 +135,11 @@ def build_h3_ref2va_workflow(
             },
         },
     }
+    if audio_name is None:
+        workflow["9"]["inputs"]["ref_video_audios.ref_video_audio_0"] = ["3", 1]
+    else:
+        workflow["19"] = {"class_type": "LoadAudio", "inputs": {"audio": audio_name}}
+        workflow["9"]["inputs"]["ref_audios.ref_audio_0"] = ["19", 0]
     if turbo:
         workflow["8"] = {
             "class_type": "LoraLoaderModelOnly",

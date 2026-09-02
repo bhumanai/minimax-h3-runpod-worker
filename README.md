@@ -19,7 +19,8 @@ Request shape:
     "workflow": {"1": {"class_type": "LoadImage", "inputs": {"image": "identity.png"}}},
     "files": [
       {"name": "identity.png", "data": "BASE64"},
-      {"name": "driver.mp4", "data": "BASE64"}
+      {"name": "driver.mp4", "data": "BASE64"},
+      {"name": "new-words.wav", "data": "BASE64"}
     ],
     "output_upload_url": "PRESIGNED_PUT_URL",
     "output_download_url": "PRESIGNED_GET_URL"
@@ -28,6 +29,9 @@ Request shape:
 ```
 
 `h3_workflow.py` builds the full official-node Ref2VA graph used by the smoke test.
+Pass `audio_name="new-words.wav"` to use standalone speech as `<Audio 1>` while
+retaining the driver video as `<Video 1>`. When `audio_name` is omitted, the
+driver video's own soundtrack remains `<Audio 1>` for backward compatibility.
 Its prompt must refer to the supplied media with the literal H3 tags
 `<Picture 1>`, `<Video 1>`, and `<Audio 1>`; untagged references are rejected
 before a paid job can be submitted.
