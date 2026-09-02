@@ -28,6 +28,9 @@ Request shape:
 ```
 
 `h3_workflow.py` builds the full official-node Ref2VA graph used by the smoke test.
+Its prompt must refer to the supplied media with the literal H3 tags
+`<Picture 1>`, `<Video 1>`, and `<Audio 1>`; untagged references are rejected
+before a paid job can be submitted.
 
 ## Verification
 

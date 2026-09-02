@@ -31,6 +31,14 @@ class WorkflowTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             build_h3_ref2va_workflow("identity.png", "driver.mp4", prompt="x", length=120)
 
+    def test_reference_prompt_requires_literal_media_tags(self):
+        with self.assertRaisesRegex(ValueError, r"<Picture 1>.*<Video 1>.*<Audio 1>"):
+            build_h3_ref2va_workflow(
+                "identity.png",
+                "driver.mp4",
+                prompt="Use Picture 1 as identity and Video 1 as motion with Audio 1.",
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

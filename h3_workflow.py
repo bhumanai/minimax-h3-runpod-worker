@@ -3,6 +3,20 @@ from __future__ import annotations
 from typing import Any
 
 
+REQUIRED_REFERENCE_TAGS = ("<Picture 1>", "<Video 1>", "<Audio 1>")
+
+
+def _validate_reference_prompt(prompt: str) -> None:
+    if not isinstance(prompt, str) or not prompt.strip():
+        raise ValueError("MiniMax H3 Ref2VA requires a non-empty prompt")
+    missing = [tag for tag in REQUIRED_REFERENCE_TAGS if tag not in prompt]
+    if missing:
+        raise ValueError(
+            "MiniMax H3 Ref2VA prompt must explicitly bind every supplied reference with "
+            + ", ".join(missing)
+        )
+
+
 def build_h3_ref2va_workflow(
     image_name: str,
     video_name: str,
@@ -21,6 +35,7 @@ def build_h3_ref2va_workflow(
         raise ValueError("length must be at least 5 frames and congruent to 5 modulo 17")
     if turbo and steps != 4:
         raise ValueError("The bundled H3 Turbo LoRA is a 4-step adapter")
+    _validate_reference_prompt(prompt)
 
     model_node = "8" if turbo else "6"
     workflow: dict[str, dict[str, Any]] = {
