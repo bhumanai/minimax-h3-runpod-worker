@@ -32,9 +32,12 @@ Request shape:
 Pass `audio_name="new-words.wav"` to use standalone speech as `<Audio 1>` while
 retaining the driver video as `<Video 1>`. When `audio_name` is omitted, the
 driver video's own soundtrack remains `<Audio 1>` for backward compatibility.
-Its prompt must refer to the supplied media with the literal H3 tags
-`<Picture 1>`, `<Video 1>`, and `<Audio 1>`; untagged references are rejected
-before a paid job can be submitted.
+Pass `video_name=None` together with standalone audio to run image-plus-audio
+generation without a motion reference; in that mode the prompt only needs
+`<Picture 1>` and `<Audio 1>`.
+Its prompt must refer to every supplied medium with the literal H3 tags
+`<Picture 1>`, `<Audio 1>`, and, when present, `<Video 1>`; untagged references
+are rejected before a paid job can be submitted.
 
 ## Verification
 

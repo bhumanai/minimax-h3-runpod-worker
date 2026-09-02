@@ -3,13 +3,10 @@ from __future__ import annotations
 from typing import Any
 
 
-REQUIRED_REFERENCE_TAGS = ("<Picture 1>", "<Video 1>", "<Audio 1>")
-
-
-def _validate_reference_prompt(prompt: str) -> None:
+def _validate_reference_prompt(prompt: str, required_tags: tuple[str, ...]) -> None:
     if not isinstance(prompt, str) or not prompt.strip():
         raise ValueError("MiniMax H3 Ref2VA requires a non-empty prompt")
-    missing = [tag for tag in REQUIRED_REFERENCE_TAGS if tag not in prompt]
+    missing = [tag for tag in required_tags if tag not in prompt]
     if missing:
         raise ValueError(
             "MiniMax H3 Ref2VA prompt must explicitly bind every supplied reference with "
@@ -19,7 +16,7 @@ def _validate_reference_prompt(prompt: str) -> None:
 
 def build_h3_ref2va_workflow(
     image_name: str,
-    video_name: str,
+    video_name: str | None,
     *,
     audio_name: str | None = None,
     prompt: str,
@@ -36,15 +33,22 @@ def build_h3_ref2va_workflow(
         raise ValueError("length must be at least 5 frames and congruent to 5 modulo 17")
     if turbo and steps != 4:
         raise ValueError("The bundled H3 Turbo LoRA is a 4-step adapter")
-    _validate_reference_prompt(prompt)
     if audio_name is not None and (not isinstance(audio_name, str) or not audio_name.strip()):
         raise ValueError("audio_name must be a non-empty filename when provided")
+    if video_name is not None and (not isinstance(video_name, str) or not video_name.strip()):
+        raise ValueError("video_name must be a non-empty filename when provided")
+    if video_name is None and audio_name is None:
+        raise ValueError("Standalone audio is required when no motion video is provided")
+
+    required_tags = ["<Picture 1>"]
+    if video_name is not None:
+        required_tags.append("<Video 1>")
+    required_tags.append("<Audio 1>")
+    _validate_reference_prompt(prompt, tuple(required_tags))
 
     model_node = "8" if turbo else "6"
     workflow: dict[str, dict[str, Any]] = {
         "1": {"class_type": "LoadImage", "inputs": {"image": image_name}},
-        "2": {"class_type": "LoadVideo", "inputs": {"file": video_name}},
-        "3": {"class_type": "GetVideoComponents", "inputs": {"video": ["2", 0]}},
         "4": {
             "class_type": "VAELoader",
             "inputs": {"vae_name": "minimax_h3_video_vae_fp16.safetensors"},
@@ -80,7 +84,6 @@ def build_h3_ref2va_workflow(
                 "length": length,
                 "ref_image_size": "match",
                 "ref_images.ref_image_0": ["1", 0],
-                "ref_videos.ref_video_0": ["3", 0],
             },
         },
         "10": {
@@ -135,6 +138,10 @@ def build_h3_ref2va_workflow(
             },
         },
     }
+    if video_name is not None:
+        workflow["2"] = {"class_type": "LoadVideo", "inputs": {"file": video_name}}
+        workflow["3"] = {"class_type": "GetVideoComponents", "inputs": {"video": ["2", 0]}}
+        workflow["9"]["inputs"]["ref_videos.ref_video_0"] = ["3", 0]
     if audio_name is None:
         workflow["9"]["inputs"]["ref_video_audios.ref_video_audio_0"] = ["3", 1]
     else:

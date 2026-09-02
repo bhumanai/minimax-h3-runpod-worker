@@ -47,6 +47,27 @@ class WorkflowTests(unittest.TestCase):
                 prompt="Use <Picture 1>, <Audio 1>, and <Video 1>.",
             )
 
+    def test_image_and_audio_graph_has_no_motion_reference(self):
+        workflow = build_h3_ref2va_workflow(
+            "identity.png",
+            None,
+            audio_name="new-words.wav",
+            prompt="Animate <Picture 1> using <Audio 1>.",
+        )
+        node = workflow["9"]
+        self.assertNotIn("2", workflow)
+        self.assertNotIn("3", workflow)
+        self.assertNotIn("ref_videos.ref_video_0", node["inputs"])
+        self.assertEqual(node["inputs"]["ref_audios.ref_audio_0"], ["19", 0])
+
+    def test_image_only_requires_standalone_audio(self):
+        with self.assertRaisesRegex(ValueError, "Standalone audio is required"):
+            build_h3_ref2va_workflow(
+                "identity.png",
+                None,
+                prompt="Animate <Picture 1>.",
+            )
+
     def test_turbo_requires_four_steps(self):
         with self.assertRaises(ValueError):
             build_h3_ref2va_workflow("identity.png", "driver.mp4", prompt="x", turbo=True, steps=20)
