@@ -1,13 +1,15 @@
-# MiniMax H3 Ref2VA RunPod worker
+# MiniMax H3 RunPod worker
 
-An isolated RunPod Serverless worker for native MiniMax H3 reference-to-video-with-audio generation. The image pins ComfyUI commit `3216c62e9962c3babd28a4dfea6e5aef50b8fe16`, because the current RunPod base release still ships ComfyUI 0.34 without the native H3 nodes.
+An isolated RunPod Serverless worker for native MiniMax H3 reference-to-video and first-frame image-to-video generation with audio. The image pins ComfyUI commit `3216c62e9962c3babd28a4dfea6e5aef50b8fe16`, because the current RunPod base release still ships ComfyUI 0.34 without the native H3 nodes.
 
 The worker accepts a ComfyUI API graph plus small base64 reference files. It writes the generated MP4 to a caller-provided presigned upload URL, avoiding RunPod's response-size limit. Model files are downloaded once onto the attached `/runpod-volume` network volume and reused across scale-to-zero cold starts.
 
 ## Runtime contract
 
 - `MINIMAX_H3_LICENSE_ACCEPTED=1` is required.
-- Attach at least a 60 GB network volume at `/runpod-volume`.
+- Attach at least a 70 GB network volume at `/runpod-volume`. The worker keeps
+  both official diffusion checkpoints: Ref2VA for reference-guided scenes and
+  FL2VA for native first-frame presenter generation.
 - Use a Blackwell GPU for the bundled NVFP4 text encoder; the intended endpoint is one B200.
 - The production-safe default is `workersMin=0`, `workersMax=1`.
 

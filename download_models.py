@@ -20,6 +20,7 @@ class ModelFile:
 
 MODEL_FILES = (
     ModelFile("diffusion_models/minimax_h3_ref2va_pruned_int8_convrot.safetensors", 20_970_379_616),
+    ModelFile("diffusion_models/minimax_h3_fl2va_pruned_int8_convrot.safetensors", 20_970_379_616),
     ModelFile("text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors", 15_687_142_551),
     ModelFile("vae/minimax_h3_video_vae_fp16.safetensors", 5_207_808_496),
     ModelFile("vae/minimax_h3_audio_vae_fp32.safetensors", 605_254_808),
